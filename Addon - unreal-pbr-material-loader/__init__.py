@@ -5,6 +5,7 @@ from .panel.ui_panel import unregister as unregister_panel
 
 bl_info = {
     "name": "PBR Material Unreal Format",
+    "version": (0, 2, 0),
     "blender": (3, 1, 0),
     "category": "Material",
 }
