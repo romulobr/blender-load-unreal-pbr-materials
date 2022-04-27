@@ -1,7 +1,4 @@
-
-
-from ..material_creator_helper import MaterialCreatorHelper
-
+from lib.material_creator_helper import MaterialCreatorHelper
 
 MATERIAL_NAME = "Some_Long_Material_Name"
 

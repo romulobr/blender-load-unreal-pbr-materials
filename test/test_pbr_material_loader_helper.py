@@ -2,13 +2,11 @@ import itertools
 
 import pytest
 
-from ..pbr_textures import PBRComponent
-from ..pbr_material_loader_helper import PBRMaterialLoaderHelper
-
-
 # file name:  Some_Long_Material_Name_BaseColor.png
 # file name:  Some_Long_Material_Name_Normal.png
 # file name:  Some_Long_Material_Name_OcclusionRoughnessMetallic.png
+from lib.pbr_material_loader_helper import PBRMaterialLoaderHelper
+from lib.pbr_textures import PBRComponent
 
 BASE_COLOR_FILE_PATH = "c:\\Some_Long_Material_Name_BaseColor.png"
 BASE_COLOR_FILE_NAME = "Some_Long_Material_Name_BaseColor.png"

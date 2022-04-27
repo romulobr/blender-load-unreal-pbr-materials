@@ -4,9 +4,9 @@ from .panel.ui_panel import register as register_panel
 from .panel.ui_panel import unregister as unregister_panel
 
 bl_info = {
-    "name": "My Test Add-on",
-    "blender": (2, 80, 0),
-    "category": "Object",
+    "name": "PBR Material Unreal Format",
+    "blender": (3, 1, 0),
+    "category": "Material",
 }
 
 

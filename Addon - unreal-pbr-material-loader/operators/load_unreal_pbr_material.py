@@ -69,12 +69,16 @@ class OT_CreateMaterialFromPBRTextureSet(Operator, ImportHelper):
         node_principled = nodes.get('Principled BSDF')
         base_color_image_node = material.node_tree.nodes.new('ShaderNodeTexImage')
         normal_image_node = material.node_tree.nodes.new('ShaderNodeTexImage')
+
         orm_image_node = material.node_tree.nodes.new('ShaderNodeTexImage')
         separate_rgb_node = material.node_tree.nodes.new('ShaderNodeSeparateRGB')
 
         base_color_image_node.image = self.base_color_texture
         normal_image_node.image = self.normal_texture
         orm_image_node.image = self.orm_texture
+
+        normal_image_node.image.colorspace_settings.name = 'Non-Color'
+        orm_image_node.image.colorspace_settings.name = 'Non-Color'
 
         links = material.node_tree.links
         links.new(base_color_image_node.outputs["Color"], node_principled.inputs["Base Color"])
