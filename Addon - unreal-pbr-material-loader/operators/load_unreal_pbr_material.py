@@ -58,20 +58,42 @@ class OT_CreateMaterialFromPBRTextureSet(Operator, ImportHelper):
 
     def _setup_nodes(self):
         def reposition_nodes():
-            base_color_image_node.location = -500, 400;
-            orm_image_node.location = -1000, 0;
+            print("reposition_nodes")
+            base_color_image_node.location = -500, 400
+            orm_image_node.location = -1000, 0
             separate_rgb_node.location = -400, 0
-            normal_image_node.location = -500, -400;
+            normal_image_node.location = -1000, -400
+            separate_xyz_node.location = -700, -400
+            math_node.location = -500, -400
+            combine_xyz_node.location = -300, -400
+            normal_map_node.location = -100, -400
 
         material = self.material
-        nodes = material.node_tree.nodes
+        print("got the material")
 
+        nodes = material.node_tree.nodes
         node_principled = nodes.get('Principled BSDF')
         base_color_image_node = material.node_tree.nodes.new('ShaderNodeTexImage')
         normal_image_node = material.node_tree.nodes.new('ShaderNodeTexImage')
 
+        print("created simpler nodes")
+        separate_xyz_node = material.node_tree.nodes.new(type='ShaderNodeSeparateXYZ')
+        print("created separate xyz node")
+        combine_xyz_node = material.node_tree.nodes.new(type='ShaderNodeCombineXYZ')
+        print("created combine xyz node")
+
+        math_node = material.node_tree.nodes.new(type='ShaderNodeMath')
+        print("created Math xyz node")
+        math_node.operation = 'SUBTRACT'
+        math_node.inputs[0].default_value = 1.0
+        print("set up math node correctly")
+
+        # create normal map node
+        normal_map_node = material.node_tree.nodes.new(type='ShaderNodeNormalMap')
+
         orm_image_node = material.node_tree.nodes.new('ShaderNodeTexImage')
         separate_rgb_node = material.node_tree.nodes.new('ShaderNodeSeparateRGB')
+        print("created Occlusion Roughness Metallic nodes")
 
         base_color_image_node.image = self.base_color_texture
         normal_image_node.image = self.normal_texture
@@ -79,13 +101,24 @@ class OT_CreateMaterialFromPBRTextureSet(Operator, ImportHelper):
 
         normal_image_node.image.colorspace_settings.name = 'Non-Color'
         orm_image_node.image.colorspace_settings.name = 'Non-Color'
+        print("set up images")
 
         links = material.node_tree.links
+        print("creating links")
         links.new(base_color_image_node.outputs["Color"], node_principled.inputs["Base Color"])
-        links.new(normal_image_node.outputs["Color"], node_principled.inputs["Normal"])
         links.new(orm_image_node.outputs["Color"], separate_rgb_node.inputs["Image"])
         links.new(separate_rgb_node.outputs["G"], node_principled.inputs["Roughness"])
         links.new(separate_rgb_node.outputs["B"], node_principled.inputs["Metallic"])
+        links.new(normal_image_node.outputs["Color"], separate_xyz_node.inputs["Vector"])
+        print("created basic links")
+
+        links.new(separate_xyz_node.outputs["X"], combine_xyz_node.inputs["X"])
+        links.new(separate_xyz_node.outputs["Z"], combine_xyz_node.inputs["Z"])
+        links.new(separate_xyz_node.outputs["Y"], math_node.inputs[1])
+        links.new(math_node.outputs[0], combine_xyz_node.inputs["Y"])
+        links.new(combine_xyz_node.outputs["Vector"], node_principled.inputs["Normal"])
+        links.new(combine_xyz_node.outputs["Vector"], normal_map_node.inputs["Color"])
+        links.new(normal_map_node.outputs["Normal"], node_principled.inputs["Normal"])
 
         reposition_nodes()
 
@@ -117,8 +150,8 @@ def unregister():
     bpy.utils.unregister_class(OT_CreateMaterialFromPBRTextureSet)
 
 
-if __name__ == "__main__":
-    register()
-
-    # test call
-    bpy.ops.rom.make_pbr_material('INVOKE_DEFAULT')
+# if __name__ == "__main__":
+#     register()
+#
+#     # test call
+#     bpy.ops.rom.make_pbr_material('INVOKE_DEFAULT')
